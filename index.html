@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Kenza! 🎂</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        
+        .birthday-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(255,105,180,0.6);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+            letter-spacing: 1px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 105, 180, 0.9);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(255, 20, 147, 1);
+            transform: scale(1.05);
+        }
+
+        .blow-btn {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(238, 90, 111, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .blow-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 8px 20px rgba(238, 90, 111, 0.6);
+        }
+
+        .blow-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        .love-note-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 40px;
+            border-radius: 20px;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 200;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255,255,255,0.3);
+            max-width: 400px;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .love-note-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .love-note-popup::before {
+            content: '❤️';
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .close-note {
+            margin-top: 15px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .close-note:hover {
+            background: white;
+            color: #764ba2;
+        }
+
+        .celebration-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 50px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff69b4;
+            z-index: 150;
+            pointer-events: none;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            width: 100%;
+        }
+
+        .celebration-text.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <button class="fullscreen-btn" id="fullscreenBtn">🖵 Fullscreen</button>
+
+    <button class="blow-btn" id="blowBtn">
+        💨 Blow Out Candles
+    </button>
+    
+    <div class="birthday-message">
+        Happy Birthday Kenza! 🎂💕
+    </div>
+
+    <div class="love-note-popup" id="lovePopup">
+        <div id="noteText">You are amazing!</div>
+        <button class="close-note" onclick="closeNote()">Close 💕</button>
+    </div>
+
+    <div class="celebration-text" id="celebration">
+    🎉Happy Birthday katkouta🎉<br>
+    <span style="font-size: 30px; color: white;">don't forget to make a wish ✨</span>
+</div>
+
+    <audio id="birthdaySong" loop style="display: none;">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Happy_Birthday_to_You_%28choral%29.ogg" type="audio/ogg">
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        let scene, camera, renderer, controls;
+        let cakeBase, cakeMiddle, cakeTop;
+        let flames = [];
+        let flameLights = [];
+        let candlePositions = [];
+        let particles, confetti;
+        let balloons = [];
+        let chandelierGroup;
+        let hearts = [];
+        let heartTexture;
+        let loveNotes = [];
+        let raycaster, mouse;
+        let wallMaterials = {};
+
+        let candlesBlown = [false, false, false, false, false];
+        let allCandlesBlown = false;
+
+        const birthdaySong = document.getElementById('birthdaySong');
+        let audioStarted = false;
+
+        const loveMessages = [
+            "Every moment with you is magical ✨",
+            "Your smile lights up my world brighter than these candles 💕",
+            "I fall for you more every single day 💘",
+            "You're my favorite person in the universe 🌟",
+            "Forever isn't long enough with you 💍",
+            "You make my heart skip a beat 💓",
+            "Happy Birthday to the most beautiful girl! 🎂"
+        ];
+
+        function tryPlayAudio() {
+            if (!audioStarted && birthdaySong) {
+                birthdaySong.volume = 0.4;
+                birthdaySong.play().then(() => {
+                    audioStarted = true;
+                }).catch(e => {
+                    console.log('Audio autoplay blocked');
+                });
+            }
+        }
+
+        window.addEventListener('load', tryPlayAudio);
+        document.addEventListener('click', function() {
+            tryPlayAudio();
+        }, { once: true });
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+            scene.fog = new THREE.FogExp2(0x1a1a2e, 0.02);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 2.5, 4);
+            camera.lookAt(0, 1.8, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 2;
+            controls.maxDistance = 12;
+            controls.maxPolarAngle = Math.PI / 2.1;
+            controls.minPolarAngle = Math.PI / 6;
+            controls.target.set(0, 1.8, 0);
+            
+            controls.addEventListener('change', () => {
+                camera.position.x = Math.max(-9, Math.min(9, camera.position.x));
+                camera.position.z = Math.max(-9, Math.min(9, camera.position.z));
+                camera.position.y = Math.max(0.5, Math.min(9, camera.position.y));
+            });
+            
+            controls.update();
+
+            const ambientLight = new THREE.AmbientLight(0x4a3a5e, 0.3);
+            scene.add(ambientLight);
+
+            const cakeLight = new THREE.SpotLight(0xffd700, 2);
+            cakeLight.position.set(0, 6, 2);
+            cakeLight.castShadow = true;
+            cakeLight.angle = Math.PI / 5;
+            cakeLight.penumbra = 0.6;
+            cakeLight.target.position.set(0, 1.5, 0);
+            scene.add(cakeLight);
+            scene.add(cakeLight.target);
+
+            const ceilingLight = new THREE.PointLight(0xffddaa, 0.4, 15);
+            ceilingLight.position.set(0, 9, 0);
+            scene.add(ceilingLight);
+
+            const rimLight = new THREE.DirectionalLight(0x6a5aff, 0.3);
+            rimLight.position.set(-5, 3, -5);
+            scene.add(rimLight);
+
+            // Generate textures before creating room
+            generateProceduralTextures();
+            
+            createRoom();
+            createTable();
+            createCake();
+            createCandles();
+            createDecorations();
+            createParticles();
+            createHeartTexture();
+            createLoveNotes();
+            initBlowCandles();
+
+            window.addEventListener('resize', onWindowResize);
+            document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+            renderer.domElement.addEventListener('click', onMouseClick);
+
+            animate();
+        }
+
+        function generateProceduralTextures() {
+            // Wood grain texture for wainscoting
+            const woodCanvas = document.createElement('canvas');
+            woodCanvas.width = 512;
+            woodCanvas.height = 512;
+            const woodCtx = woodCanvas.getContext('2d');
+            
+            // Base wood color
+            woodCtx.fillStyle = '#3d2817';
+            woodCtx.fillRect(0, 0, 512, 512);
+            
+            // Wood grain lines
+            woodCtx.globalAlpha = 0.15;
+            woodCtx.strokeStyle = '#1a0f08';
+            woodCtx.lineWidth = 2;
+            
+            for (let i = 0; i < 60; i++) {
+                woodCtx.beginPath();
+                woodCtx.moveTo(0, Math.random() * 512);
+                woodCtx.bezierCurveTo(
+                    170, Math.random() * 512,
+                    340, Math.random() * 512,
+                    512, Math.random() * 512
+                );
+                woodCtx.stroke();
+            }
+            
+            // Add wood knots
+            for (let i = 0; i < 5; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                const radius = 10 + Math.random() * 20;
+                
+                const gradient = woodCtx.createRadialGradient(x, y, 0, x, y, radius);
+                gradient.addColorStop(0, 'rgba(26, 15, 8, 0.4)');
+                gradient.addColorStop(0.5, 'rgba(61, 40, 23, 0.2)');
+                gradient.addColorStop(1, 'rgba(61, 40, 23, 0)');
+                
+                woodCtx.fillStyle = gradient;
+                woodCtx.beginPath();
+                woodCtx.arc(x, y, radius, 0, Math.PI * 2);
+                woodCtx.fill();
+            }
+            
+            wallMaterials.wood = new THREE.CanvasTexture(woodCanvas);
+            wallMaterials.wood.wrapS = THREE.RepeatWrapping;
+            wallMaterials.wood.wrapT = THREE.RepeatWrapping;
+            
+            // Damask wallpaper pattern
+            const paperCanvas = document.createElement('canvas');
+            paperCanvas.width = 512;
+            paperCanvas.height = 512;
+            const paperCtx = paperCanvas.getContext('2d');
+            
+            // Base wallpaper color - elegant deep purple
+            paperCtx.fillStyle = '#2d1f3f';
+            paperCtx.fillRect(0, 0, 512, 512);
+            
+            // Damask pattern
+            paperCtx.strokeStyle = '#3d2f4f';
+            paperCtx.fillStyle = '#3d2f4f';
+            paperCtx.lineWidth = 2;
+            paperCtx.globalAlpha = 0.6;
+            
+            const patternSize = 64;
+            for (let x = 0; x < 512; x += patternSize) {
+                for (let y = 0; y < 512; y += patternSize) {
+                    // Draw ornate floral motif
+                    paperCtx.save();
+                    paperCtx.translate(x + patternSize/2, y + patternSize/2);
+                    
+                    // Central rosette
+                    paperCtx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const r = i % 2 === 0 ? 12 : 6;
+                        paperCtx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                    }
+                    paperCtx.closePath();
+                    paperCtx.fill();
+                    
+                    // Surrounding leaves
+                    for (let i = 0; i < 4; i++) {
+                        paperCtx.save();
+                        paperCtx.rotate((i / 4) * Math.PI * 2);
+                        paperCtx.beginPath();
+                        paperCtx.ellipse(0, 20, 4, 10, 0, 0, Math.PI * 2);
+                        paperCtx.fill();
+                        paperCtx.restore();
+                    }
+                    
+                    paperCtx.restore();
+                }
+            }
+            
+            // Add subtle texture noise
+            const imageData = paperCtx.getImageData(0, 0, 512, 512);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const noise = (Math.random() - 0.5) * 10;
+                data[i] = Math.max(0, Math.min(255, data[i] + noise));
+                data[i+1] = Math.max(0, Math.min(255, data[i+1] + noise));
+                data[i+2] = Math.max(0, Math.min(255, data[i+2] + noise));
+            }
+            paperCtx.putImageData(imageData, 0, 0);
+            
+            wallMaterials.wallpaper = new THREE.CanvasTexture(paperCanvas);
+            wallMaterials.wallpaper.wrapS = THREE.RepeatWrapping;
+            wallMaterials.wallpaper.wrapT = THREE.RepeatWrapping;
+            wallMaterials.wallpaper.repeat.set(2, 2);
+            
+            // Normal map simulation for wood (bump map)
+            const bumpCanvas = document.createElement('canvas');
+            bumpCanvas.width = 512;
+            bumpCanvas.height = 512;
+            const bumpCtx = bumpCanvas.getContext('2d');
+            
+            bumpCtx.fillStyle = '#808080';
+            bumpCtx.fillRect(0, 0, 512, 512);
+            
+            bumpCtx.globalAlpha = 0.3;
+            for (let i = 0; i < 40; i++) {
+                bumpCtx.strokeStyle = i % 2 === 0 ? '#ffffff' : '#000000';
+                bumpCtx.lineWidth = 1;
+                bumpCtx.beginPath();
+                bumpCtx.moveTo(0, Math.random() * 512);
+                bumpCtx.bezierCurveTo(
+                    170, Math.random() * 512,
+                    340, Math.random() * 512,
+                    512, Math.random() * 512
+                );
+                bumpCtx.stroke();
+            }
+            
+            wallMaterials.woodBump = new THREE.CanvasTexture(bumpCanvas);
+            wallMaterials.woodBump.wrapS = THREE.RepeatWrapping;
+            wallMaterials.woodBump.wrapT = THREE.RepeatWrapping;
+        }
+
+        function createLoveNotes() {
+            const noteTexture = createNoteTexture();
+            
+            for (let i = 0; i < 7; i++) {
+                const heartGroup = new THREE.Group();
+                
+                const material = new THREE.SpriteMaterial({
+                    map: noteTexture,
+                    transparent: true,
+                    opacity: 1.0,
+                    color: 0xffffff
+                });
+                
+                const note = new THREE.Sprite(material);
+                note.scale.set(0.8, 0.8, 0.8);
+                
+                const heartLight = new THREE.PointLight(0xff69b4, 0.8, 3);
+                heartLight.position.set(0, 0, 0.1);
+                heartGroup.add(heartLight);
+                heartGroup.add(note);
+                
+                const angle = (i / 7) * Math.PI * 2;
+                const radius = 3.5 + Math.random() * 1.5;
+                heartGroup.position.set(
+                    Math.cos(angle) * radius,
+                    2.5 + Math.random() * 2.5,
+                    Math.sin(angle) * radius
+                );
+                
+                heartGroup.userData = {
+                    message: loveMessages[i],
+                    id: i,
+                    baseY: heartGroup.position.y,
+                    floatSpeed: 0.5 + Math.random() * 0.5,
+                    floatOffset: Math.random() * Math.PI * 2,
+                    noteSprite: note,
+                    baseScale: 0.8,
+                    pulseSpeed: 2 + Math.random() * 2
+                };
+                
+                scene.add(heartGroup);
+                loveNotes.push(heartGroup);
+            }
+        }
+
+        function createNoteTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            
+            const x = 64, y = 64, size = 50;
+            
+            const gradient = ctx.createRadialGradient(x, y, size * 0.5, x, y, size * 1.5);
+            gradient.addColorStop(0, 'rgba(255, 105, 180, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(255, 20, 147, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 128, 128);
+            
+            ctx.fillStyle = '#ff1493';
+            ctx.beginPath();
+            ctx.moveTo(x, y + size / 4);
+            ctx.quadraticCurveTo(x, y, x + size / 4, y);
+            ctx.quadraticCurveTo(x + size / 2, y, x + size / 2, y + size / 4);
+            ctx.quadraticCurveTo(x + size / 2, y, x + size * 3/4, y);
+            ctx.quadraticCurveTo(x + size, y, x + size, y + size / 4);
+            ctx.quadraticCurveTo(x + size, y + size / 2, x + size * 3/4, y + size * 3/4);
+            ctx.lineTo(x, y + size);
+            ctx.lineTo(x + size / 4, y + size * 3/4);
+            ctx.quadraticCurveTo(x, y + size / 2, x, y + size / 4);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.arc(x - 15, y - 10, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 30px serif';
+            ctx.fillText('✨', x + 20, y - 15);
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function initBlowCandles() {
+            const blowBtn = document.getElementById('blowBtn');
+            
+            blowBtn.addEventListener('click', () => {
+                if (!allCandlesBlown) {
+                    blowAllCandles();
+                }
+            });
+        }
+
+        function blowAllCandles() {
+            let delay = 0;
+            flames.forEach((flame, i) => {
+                if (!candlesBlown[i]) {
+                    setTimeout(() => {
+                        blowOutCandle(i);
+                    }, delay);
+                    delay += 200;
+                }
+            });
+        }
+
+        function blowOutCandle(index) {
+            if (candlesBlown[index]) return;
+            
+            candlesBlown[index] = true;
+            
+            const flame = flames[index];
+            const light = flameLights[index];
+            
+            const shrinkInterval = setInterval(() => {
+                flame.core.scale.multiplyScalar(0.8);
+                flame.inner.scale.multiplyScalar(0.8);
+                flame.middle.scale.multiplyScalar(0.8);
+                flame.outer.scale.multiplyScalar(0.8);
+                light.intensity *= 0.8;
+                
+                if (flame.core.scale.y < 0.1) {
+                    clearInterval(shrinkInterval);
+                    flame.core.visible = false;
+                    flame.inner.visible = false;
+                    flame.middle.visible = false;
+                    flame.outer.visible = false;
+                    light.visible = false;
+                    
+                    createSmoke(candlePositions[index]);
+                    checkAllBlown();
+                }
+            }, 50);
+        }
+
+        function createSmoke(pos) {
+            for (let i = 0; i < 5; i++) {
+                const smoke = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.05, 8, 8),
+                    new THREE.MeshBasicMaterial({
+                        color: 0x888888,
+                        transparent: true,
+                        opacity: 0.5
+                    })
+                );
+                smoke.position.set(pos[0], pos[1] + 0.3, pos[2]);
+                smoke.userData = {
+                    velocity: 0.02 + Math.random() * 0.02,
+                    drift: (Math.random() - 0.5) * 0.01,
+                    life: 1.0
+                };
+                scene.add(smoke);
+                
+                const animateSmoke = () => {
+                    smoke.position.y += smoke.userData.velocity;
+                    smoke.position.x += smoke.userData.drift;
+                    smoke.userData.life -= 0.02;
+                    smoke.material.opacity = smoke.userData.life * 0.5;
+                    smoke.scale.multiplyScalar(1.05);
+                    
+                    if (smoke.userData.life > 0) {
+                        requestAnimationFrame(animateSmoke);
+                    } else {
+                        scene.remove(smoke);
+                    }
+                };
+                animateSmoke();
+            }
+        }
+
+        function checkAllBlown() {
+            if (candlesBlown.every(b => b) && !allCandlesBlown) {
+                allCandlesBlown = true;
+                document.getElementById('celebration').classList.add('show');
+                document.getElementById('blowBtn').style.display = 'none';
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => spawnHeart(), i * 50);
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('celebration').classList.remove('show');
+                }, 4000);
+            }
+        }
+
+        function checkCandleClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            
+            for (let i = 0; i < flames.length; i++) {
+                if (candlesBlown[i]) continue;
+                
+                const flamePos = new THREE.Vector3(...candlePositions[i]);
+                flamePos.y += 0.28;
+                
+                const distance = raycaster.ray.distanceToPoint(flamePos);
+                if (distance < 0.3) {
+                    blowOutCandle(i);
+                    break;
+                }
+            }
+        }
+
+        function onMouseClick(event) {
+            if (!allCandlesBlown) {
+                checkCandleClick(event);
+            }
+            
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            
+            const noteSprites = loveNotes.map(group => group.children[1]);
+            
+            const intersects = raycaster.intersectObjects(noteSprites);
+            
+            if (intersects.length > 0) {
+                const clickedSprite = intersects[0].object;
+                const noteGroup = clickedSprite.parent;
+                showNote(noteGroup.userData.message);
+                
+                noteGroup.userData.noteSprite.scale.set(1.0, 1.0, 1.0);
+                setTimeout(() => {
+                    noteGroup.userData.noteSprite.scale.set(0.8, 0.8, 0.8);
+                }, 200);
+            }
+        }
+
+        function showNote(message) {
+            const popup = document.getElementById('lovePopup');
+            document.getElementById('noteText').textContent = message;
+            popup.classList.add('show');
+        }
+
+        function closeNote() {
+            document.getElementById('lovePopup').classList.remove('show');
+        }
+
+        function createRoom() {
+            // Enhanced Floor with parquet pattern
+            const floorGroup = new THREE.Group();
+            
+            // Base floor
+            const floorGeometry = new THREE.PlaneGeometry(20, 20);
+            const floorMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x2a1f15,
+                roughness: 0.6,
+                metalness: 0.1
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            floorGroup.add(floor);
+
+            // Parquet pattern tiles
+            for (let x = -10; x < 10; x += 2) {
+                for (let z = -10; z < 10; z += 2) {
+                    const tileGeometry = new THREE.PlaneGeometry(1.9, 1.9);
+                    const tileMaterial = new THREE.MeshStandardMaterial({ 
+                        color: (x + z) % 4 === 0 ? 0x3a2a1e : 0x2a1a12,
+                        roughness: 0.7,
+                        metalness: 0.05
+                    });
+                    const tile = new THREE.Mesh(tileGeometry, tileMaterial);
+                    tile.rotation.x = -Math.PI / 2;
+                    tile.position.set(x + 1, 0.01, z + 1);
+                    tile.receiveShadow = true;
+                    floorGroup.add(tile);
+                    
+                    // Add subtle border to each tile
+                    const border = new THREE.Mesh(
+                        new THREE.PlaneGeometry(1.9, 0.05),
+                        new THREE.MeshStandardMaterial({ color: 0x1a0f08, roughness: 0.9 })
+                    );
+                    border.rotation.x = -Math.PI / 2;
+                    border.position.set(x + 1, 0.015, z + 1 - 0.925);
+                    floorGroup.add(border);
+                    
+                    const border2 = border.clone();
+                    border2.position.set(x + 1, 0.015, z + 1 + 0.925);
+                    floorGroup.add(border2);
+                }
+            }
+            scene.add(floorGroup);
+
+            // Ceiling with coffered detail
+            const ceilingGroup = new THREE.Group();
+            const ceilingGeometry = new THREE.PlaneGeometry(20, 20);
+            const ceilingMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xf5f5f0,
+                roughness: 0.9,
+                side: THREE.DoubleSide
+            });
+            const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+            ceiling.rotation.x = Math.PI / 2;
+            ceiling.position.y = 10;
+            ceilingGroup.add(ceiling);
+            
+            // Coffered ceiling beams
+            const beamMaterial = new THREE.MeshStandardMaterial({
+                color: 0xe0e0d0,
+                roughness: 0.8
+            });
+            
+            for (let i = -8; i <= 8; i += 4) {
+                const beamX = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.3, 0.2, 20),
+                    beamMaterial
+                );
+                beamX.position.set(i, 9.9, 0);
+                ceilingGroup.add(beamX);
+                
+                const beamZ = new THREE.Mesh(
+                    new THREE.BoxGeometry(20, 0.2, 0.3),
+                    beamMaterial
+                );
+                beamZ.position.set(0, 9.9, i);
+                ceilingGroup.add(beamZ);
+            }
+            scene.add(ceilingGroup);
+
+            // Create pilasters for corners
+            const pilasterMaterial = new THREE.MeshStandardMaterial({
+                color: 0xf5f5f0,
+                roughness: 0.5,
+                metalness: 0.1
+            });
+            
+            const pilasterPositions = [
+                [-9.8, -9.8], [9.8, -9.8], [9.8, 9.8], [-9.8, 9.8]
+            ];
+            
+            pilasterPositions.forEach(pos => {
+                const pilaster = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.4, 10, 0.4),
+                    pilasterMaterial
+                );
+                pilaster.position.set(pos[0], 5, pos[1]);
+                pilaster.castShadow = true;
+                scene.add(pilaster);
+                
+                // Pilaster base
+                const base = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.6, 0.3, 0.6),
+                    pilasterMaterial
+                );
+                base.position.set(pos[0], 0.15, pos[1]);
+                scene.add(base);
+                
+                // Pilaster capital
+                const capital = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.6, 0.3, 0.6),
+                    pilasterMaterial
+                );
+                capital.position.set(pos[0], 9.85, pos[1]);
+                scene.add(capital);
+            });
+
+            // Enhanced Walls with wainscoting and wallpaper
+            const wallHeight = 10;
+            const chairRailHeight = 3.5;
+            
+            // Back Wall
+            createLuxuryWall(0, 5, -9.9, 0, 20, wallHeight, chairRailHeight);
+            // Left Wall
+            createLuxuryWall(-9.9, 5, 0, Math.PI / 2, 20, wallHeight, chairRailHeight);
+            // Right Wall
+            createLuxuryWall(9.9, 5, 0, -Math.PI / 2, 20, wallHeight, chairRailHeight);
+            // Front Wall
+            createLuxuryWall(0, 5, 9.9, Math.PI, 20, wallHeight, chairRailHeight);
+
+            // Chandelier
+            chandelierGroup = new THREE.Group();
+            
+            const chainGeometry = new THREE.CylinderGeometry(0.02, 0.02, 2, 8);
+            const chainMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x8b8b8b,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+            const chain = new THREE.Mesh(chainGeometry, chainMaterial);
+            chain.position.y = 9;
+            chandelierGroup.add(chain);
+
+            const chandelierBodyGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const chandelierBodyMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xffd700,
+                metalness: 0.9,
+                roughness: 0.1,
+                emissive: 0xffaa00,
+                emissiveIntensity: 0.3
+            });
+            const chandelierBody = new THREE.Mesh(chandelierBodyGeometry, chandelierBodyMaterial);
+            chandelierBody.position.y = 8;
+            chandelierGroup.add(chandelierBody);
+
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                
+                const bulbGeometry = new THREE.SphereGeometry(0.08, 12, 12);
+                const bulbMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffffcc,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const bulb = new THREE.Mesh(bulbGeometry, bulbMaterial);
+                bulb.position.set(Math.cos(angle) * 0.5, 7.8, Math.sin(angle) * 0.5);
+                chandelierGroup.add(bulb);
+
+                const bulbLight = new THREE.PointLight(0xffffcc, 0.2, 3);
+                bulbLight.position.set(Math.cos(angle) * 0.5, 7.8, Math.sin(angle) * 0.5);
+                chandelierGroup.add(bulbLight);
+            }
+
+            scene.add(chandelierGroup);
+        }
+
+        function createLuxuryWall(x, y, z, rotationY, width, height, chairRailHeight) {
+            const wallGroup = new THREE.Group();
+            
+            // Lower wall - Wood wainscoting
+            const lowerWall = new THREE.Mesh(
+                new THREE.BoxGeometry(width, chairRailHeight, 0.2),
+                new THREE.MeshStandardMaterial({
+                    map: wallMaterials.wood,
+                    bumpMap: wallMaterials.woodBump,
+                    bumpScale: 0.02,
+                    roughness: 0.6,
+                    metalness: 0.1
+                })
+            );
+            lowerWall.position.set(0, chairRailHeight / 2, 0);
+            lowerWall.castShadow = true;
+            lowerWall.receiveShadow = true;
+            wallGroup.add(lowerWall);
+            
+            // Raised panel details on wainscoting
+            const panelWidth = 3;
+            const numPanels = Math.floor(width / panelWidth);
+            const startX = -width / 2 + panelWidth / 2;
+            
+            for (let i = 0; i < numPanels; i++) {
+                const panelX = startX + i * panelWidth;
+                
+                // Recessed panel
+                const panel = new THREE.Mesh(
+                    new THREE.BoxGeometry(panelWidth - 0.3, chairRailHeight - 0.6, 0.05),
+                    new THREE.MeshStandardMaterial({
+                        color: 0x2d1f15,
+                        roughness: 0.7,
+                        metalness: 0.05
+                    })
+                );
+                panel.position.set(panelX, chairRailHeight / 2, 0.12);
+                wallGroup.add(panel);
+                
+                // Panel molding frame
+                const frameThickness = 0.08;
+                const frameDepth = 0.08;
+                
+                // Top frame
+                const topFrame = new THREE.Mesh(
+                    new THREE.BoxGeometry(panelWidth - 0.2, frameThickness, frameDepth),
+                    new THREE.MeshStandardMaterial({
+                        color: 0xd4af37,
+                        roughness: 0.3,
+                        metalness: 0.6
+                    })
+                );
+                topFrame.position.set(panelX, chairRailHeight - 0.3, 0.15);
+                wallGroup.add(topFrame);
+                
+                // Bottom frame
+                const botFrame = topFrame.clone();
+                botFrame.position.set(panelX, 0.3, 0.15);
+                wallGroup.add(botFrame);
+                
+                // Left frame
+                const leftFrame = new THREE.Mesh(
+                    new THREE.BoxGeometry(frameThickness, chairRailHeight - 0.6, frameDepth),
+                    new THREE.MeshStandardMaterial({
+                        color: 0xd4af37,
+                        roughness: 0.3,
+                        metalness: 0.6
+                    })
+                );
+                leftFrame.position.set(panelX - panelWidth/2 + 0.15, chairRailHeight/2, 0.15);
+                wallGroup.add(leftFrame);
+                
+                // Right frame
+                const rightFrame = leftFrame.clone();
+                rightFrame.position.set(panelX + panelWidth/2 - 0.15, chairRailHeight/2, 0.15);
+                wallGroup.add(rightFrame);
+            }
+            
+            // Chair rail (transition piece)
+            const chairRail = new THREE.Mesh(
+                new THREE.BoxGeometry(width, 0.15, 0.25),
+                new THREE.MeshStandardMaterial({
+                    color: 0xf5f5f0,
+                    roughness: 0.4,
+                    metalness: 0.1
+                })
+            );
+            chairRail.position.set(0, chairRailHeight, 0.05);
+            chairRail.castShadow = true;
+            wallGroup.add(chairRail);
+            
+            // Upper wall - Wallpaper
+            const upperWallHeight = height - chairRailHeight;
+            const upperWall = new THREE.Mesh(
+                new THREE.BoxGeometry(width, upperWallHeight, 0.15),
+                new THREE.MeshStandardMaterial({
+                    map: wallMaterials.wallpaper,
+                    roughness: 0.9,
+                    metalness: 0.0
+                })
+            );
+            upperWall.position.set(0, chairRailHeight + upperWallHeight / 2, 0);
+            upperWall.castShadow = true;
+            upperWall.receiveShadow = true;
+            wallGroup.add(upperWall);
+            
+            // Crown molding (ornate top)
+            const crownGroup = createCrownMolding(width);
+            crownGroup.position.set(0, height, 0.1);
+            wallGroup.add(crownGroup);
+            
+            // Baseboard
+            const baseboard = new THREE.Mesh(
+                new THREE.BoxGeometry(width, 0.25, 0.15),
+                new THREE.MeshStandardMaterial({
+                    color: 0xf5f5f0,
+                    roughness: 0.5
+                })
+            );
+            baseboard.position.set(0, 0.125, 0.05);
+            wallGroup.add(baseboard);
+            
+            // Wall sconces
+            if (Math.abs(x) > 5 || Math.abs(z) > 5) {
+                const sconceY = chairRailHeight + 2;
+                
+                [-width/3, width/3].forEach(sconceX => {
+                    const sconceGroup = new THREE.Group();
+                    
+                    // Mounting plate
+                    const plate = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.15, 0.15, 0.05, 16),
+                        new THREE.MeshStandardMaterial({
+                            color: 0xd4af37,
+                            metalness: 0.8,
+                            roughness: 0.2
+                        })
+                    );
+                    plate.rotation.x = Math.PI / 2;
+                    sconceGroup.add(plate);
+                    
+                    // Arm
+                    const arm = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.02, 0.02, 0.3, 8),
+                        new THREE.MeshStandardMaterial({
+                            color: 0xd4af37,
+                            metalness: 0.8,
+                            roughness: 0.2
+                        })
+                    );
+                    arm.rotation.x = Math.PI / 2;
+                    arm.position.z = 0.15;
+                    sconceGroup.add(arm);
+                    
+                    // Light fixture
+                    const fixture = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.12, 16, 16),
+                        new THREE.MeshStandardMaterial({
+                            color: 0xffffff,
+                            emissive: 0xffaa00,
+                            emissiveIntensity: 0.3,
+                            transparent: true,
+                            opacity: 0.9
+                        })
+                    );
+                    fixture.position.z = 0.3;
+                    sconceGroup.add(fixture);
+                    
+                    // Light
+                    const light = new THREE.PointLight(0xffaa00, 0.4, 5);
+                    light.position.set(0, 0, 0.4);
+                    sconceGroup.add(light);
+                    
+                    sconceGroup.position.set(sconceX, sconceY, 0.1);
+                    wallGroup.add(sconceGroup);
+                });
+            }
+            
+            wallGroup.position.set(x, y - height/2, z);
+            wallGroup.rotation.y = rotationY;
+            scene.add(wallGroup);
+        }
+
+        function createCrownMolding(width) {
+            const group = new THREE.Group();
+            
+            // Create profile shape for crown molding
+            const shape = new THREE.Shape();
+            shape.moveTo(0, 0);
+            shape.lineTo(0, 0.15);
+            shape.quadraticCurveTo(0.05, 0.15, 0.08, 0.12);
+            shape.lineTo(0.15, 0.05);
+            shape.lineTo(0.25, 0);
+            shape.lineTo(0, 0);
+            
+            const extrudeSettings = {
+                steps: 1,
+                depth: width,
+                bevelEnabled: false
+            };
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xf5f5f0,
+                roughness: 0.4,
+                metalness: 0.1
+            });
+            
+            const molding = new THREE.Mesh(geometry, material);
+            molding.rotation.y = Math.PI / 2;
+            molding.position.x = -width / 2;
+            group.add(molding);
+            
+            return group;
+        }
+
+        function createTable() {
+            const tableMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x6b4423,
+                roughness: 0.6,
+                metalness: 0.1
+            });
+
+            const tableTop = new THREE.Mesh(
+                new THREE.BoxGeometry(4.5, 0.15, 3.2),
+                tableMaterial
+            );
+            tableTop.position.set(0, 1.5, 0);
+            tableTop.castShadow = true;
+            tableTop.receiveShadow = true;
+            scene.add(tableTop);
+
+            const edgeMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x5a3a1e,
+                roughness: 0.5,
+                metalness: 0.15
+            });
+
+            const edgeThickness = 0.08;
+            const edges = [
+                new THREE.Mesh(new THREE.BoxGeometry(4.6, edgeThickness, edgeThickness), edgeMaterial),
+                new THREE.Mesh(new THREE.BoxGeometry(4.6, edgeThickness, edgeThickness), edgeMaterial),
+                new THREE.Mesh(new THREE.BoxGeometry(edgeThickness, edgeThickness, 3.2), edgeMaterial),
+                new THREE.Mesh(new THREE.BoxGeometry(edgeThickness, edgeThickness, 3.2), edgeMaterial)
+            ];
+
+            edges[0].position.set(0, 1.58, 1.6);
+            edges[1].position.set(0, 1.58, -1.6);
+            edges[2].position.set(-2.25, 1.58, 0);
+            edges[3].position.set(2.25, 1.58, 0);
+
+            edges.forEach(edge => {
+                edge.castShadow = true;
+                scene.add(edge);
+            });
+
+            const apronMaterial = new THREE.MeshStandardMaterial({ color: 0x5a3515, roughness: 0.7 });
+            const apronHeight = 0.2;
+            const apronPositions = [
+                { size: [4.3, apronHeight, 0.08], pos: [0, 1.35, 1.55] },
+                { size: [4.3, apronHeight, 0.08], pos: [0, 1.35, -1.55] },
+                { size: [0.08, apronHeight, 3], pos: [-2.15, 1.35, 0] },
+                { size: [0.08, apronHeight, 3], pos: [2.15, 1.35, 0] }
+            ];
+
+            apronPositions.forEach(({ size, pos }) => {
+                const apron = new THREE.Mesh(new THREE.BoxGeometry(...size), apronMaterial);
+                apron.position.set(...pos);
+                apron.castShadow = true;
+                scene.add(apron);
+            });
+
+            const legGeometry = new THREE.CylinderGeometry(0.1, 0.12, 1.3, 16);
+            const legPositions = [[-1.9, 0.65, -1.35], [1.9, 0.65, -1.35], [-1.9, 0.65, 1.35], [1.9, 0.65, 1.35]];
+            
+            legPositions.forEach(pos => {
+                const leg = new THREE.Mesh(legGeometry, tableMaterial);
+                leg.position.set(...pos);
+                leg.castShadow = true;
+                scene.add(leg);
+
+                const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.05, 16), edgeMaterial);
+                cap.position.set(pos[0], 0.025, pos[2]);
+                scene.add(cap);
+
+                const rings = [0.4, 0.8, 1.1];
+                rings.forEach(height => {
+                    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), edgeMaterial);
+                    ring.rotation.x = Math.PI / 2;
+                    ring.position.set(pos[0], height, pos[2]);
+                    scene.add(ring);
+                });
+            });
+
+            const centerpieceBase = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.8, 0.9, 0.08, 32),
+                new THREE.MeshStandardMaterial({ color: 0x8b6f47, roughness: 0.4, metalness: 0.3 })
+            );
+            centerpieceBase.position.set(0, 1.62, 0);
+            centerpieceBase.castShadow = true;
+            scene.add(centerpieceBase);
+
+            const doily = new THREE.Mesh(
+                new THREE.CylinderGeometry(1, 1, 0.01, 32),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, transparent: true, opacity: 0.9 })
+            );
+            doily.position.set(0, 1.66, 0);
+            scene.add(doily);
+
+            for (let i = 0; i < 24; i++) {
+                const angle = (i / 24) * Math.PI * 2;
+                const laceDetail = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+                laceDetail.position.set(Math.cos(angle) * 0.95, 1.665, Math.sin(angle) * 0.95);
+                scene.add(laceDetail);
+            }
+
+            const clothAccents = [[-2.1, 1.59, -1.5], [2.1, 1.59, -1.5], [-2.1, 1.59, 1.5], [2.1, 1.59, 1.5]];
+            clothAccents.forEach(pos => {
+                const accent = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.3, metalness: 0.6 }));
+                accent.position.set(...pos);
+                scene.add(accent);
+            });
+        }
+
+        function createCake() {
+            cakeBase = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.8, 0.8, 0.5, 32),
+                new THREE.MeshStandardMaterial({ color: 0x6b4423, roughness: 0.6, metalness: 0.05 })
+            );
+            cakeBase.position.set(0, 1.85, 0);
+            cakeBase.castShadow = true;
+            scene.add(cakeBase);
+
+            cakeMiddle = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.6, 0.6, 0.4, 32),
+                new THREE.MeshStandardMaterial({ color: 0xff1493, roughness: 0.5, metalness: 0.05 })
+            );
+            cakeMiddle.position.set(0, 2.3, 0);
+            cakeMiddle.castShadow = true;
+            scene.add(cakeMiddle);
+
+            cakeTop = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.4, 0.4, 0.3, 32),
+                new THREE.MeshStandardMaterial({ color: 0xfff5e6, roughness: 0.5, metalness: 0.05 })
+            );
+            cakeTop.position.set(0, 2.65, 0);
+            cakeTop.castShadow = true;
+            scene.add(cakeTop);
+
+            const frostingMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.15, metalness: 0.15 });
+            const frostingPositions = [[2.1, 0.65], [2.5, 0.45], [2.8, 0.35]];
+
+            frostingPositions.forEach(([y, radius]) => {
+                const frosting = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.08, 16, 32), frostingMaterial);
+                frosting.rotation.x = Math.PI / 2;
+                frosting.position.y = y;
+                scene.add(frosting);
+
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
+                    const frostingDot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), frostingMaterial);
+                    frostingDot.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+                    scene.add(frostingDot);
+                }
+            });
+
+            for (let i = 0; i < 16; i++) {
+                const angle = (i / 16) * Math.PI * 2;
+                const drip = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.02, 0.15, 8), frostingMaterial);
+                drip.position.set(Math.cos(angle) * 0.78, 1.67, Math.sin(angle) * 0.78);
+                scene.add(drip);
+            }
+
+            const strawberryPositions = [[0.18, 2.85, 0], [-0.18, 2.85, 0], [0, 2.85, 0.18], [0, 2.85, -0.18], [0.12, 2.9, 0.12], [-0.12, 2.9, 0.12], [0.12, 2.9, -0.12], [-0.12, 2.9, -0.12]];
+            strawberryPositions.forEach(pos => {
+                const strawberry = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.4 }));
+                strawberry.position.set(...pos);
+                strawberry.scale.set(1, 1.2, 1);
+                scene.add(strawberry);
+
+                const leaf = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.03, 5), new THREE.MeshStandardMaterial({ color: 0x228b22 }));
+                leaf.position.set(pos[0], pos[1] + 0.08, pos[2]);
+                leaf.rotation.x = Math.PI;
+                scene.add(leaf);
+
+                for (let i = 0; i < 8; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 0.06;
+                    const seed = new THREE.Mesh(new THREE.SphereGeometry(0.008, 4, 4), new THREE.MeshStandardMaterial({ color: 0xffff99 }));
+                    seed.position.set(pos[0] + Math.cos(angle) * dist, pos[1] + (Math.random() - 0.5) * 0.08, pos[2] + Math.sin(angle) * dist);
+                    scene.add(seed);
+                }
+            });
+
+            for (let i = 0; i < 40; i++) {
+                const angle = (i / 40) * Math.PI * 2;
+                const colors = [0xffd700, 0xff69b4, 0x4169e1, 0xff1493, 0x9370db];
+                const sprinkle = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), new THREE.MeshStandardMaterial({ color: colors[i % colors.length], metalness: 0.5, roughness: 0.3 }));
+                sprinkle.position.set(Math.cos(angle) * 0.58, 2.35 + Math.random() * 0.3, Math.sin(angle) * 0.58);
+                scene.add(sprinkle);
+            }
+
+            for (let i = 0; i < 15; i++) {
+                const shaving = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.01, 0.08), new THREE.MeshStandardMaterial({ color: 0x4a2511, roughness: 0.6 }));
+                shaving.position.set((Math.random() - 0.5) * 0.6, 2.82, (Math.random() - 0.5) * 0.6);
+                shaving.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                scene.add(shaving);
+            }
+
+            const plate = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.95, 0.95, 0.05, 32),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, metalness: 0.7 })
+            );
+            plate.position.set(0, 1.58, 0);
+            plate.castShadow = true;
+            plate.receiveShadow = true;
+            scene.add(plate);
+
+            const plateEdge = new THREE.Mesh(new THREE.TorusGeometry(0.92, 0.03, 16, 32), new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2, metalness: 0.8 }));
+            plateEdge.rotation.x = Math.PI / 2;
+            plateEdge.position.y = 1.61;
+            scene.add(plateEdge);
+        }
+
+        function createCandles() {
+            candlePositions = [[0, 2.9, 0], [0.12, 2.9, 0], [-0.12, 2.9, 0], [0, 2.9, 0.12], [0, 2.9, -0.12]];
+            const candleColors = [0xff69b4, 0xffeb3b, 0x4169e1, 0xff1493, 0x9370db];
+
+            candlePositions.forEach((pos, i) => {
+                const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.35, 16), new THREE.MeshStandardMaterial({ color: candleColors[i], roughness: 0.4, metalness: 0.1 }));
+                candle.position.set(pos[0], pos[1], pos[2]);
+                candle.castShadow = true;
+                scene.add(candle);
+
+                const coreFlame = new THREE.Mesh(new THREE.SphereGeometry(0.035, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffcc, transparent: true, opacity: 1 }));
+                coreFlame.position.set(pos[0], pos[1] + 0.28, pos[2]);
+                coreFlame.scale.set(1, 1.8, 1);
+                scene.add(coreFlame);
+
+                const innerFlame = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffdd00, transparent: true, opacity: 0.85 }));
+                innerFlame.position.set(pos[0], pos[1] + 0.28, pos[2]);
+                innerFlame.scale.set(1, 1.6, 1);
+                scene.add(innerFlame);
+
+                const middleFlame = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.7 }));
+                middleFlame.position.set(pos[0], pos[1] + 0.27, pos[2]);
+                middleFlame.scale.set(1, 1.5, 1);
+                scene.add(middleFlame);
+
+                const outerFlame = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.5 }));
+                outerFlame.position.set(pos[0], pos[1] + 0.26, pos[2]);
+                outerFlame.scale.set(1, 1.4, 1);
+                scene.add(outerFlame);
+
+                flames.push({ core: coreFlame, inner: innerFlame, middle: middleFlame, outer: outerFlame });
+
+                const flameLight = new THREE.PointLight(0xff6600, 0.5, 1.8);
+                flameLight.position.set(pos[0], pos[1] + 0.28, pos[2]);
+                scene.add(flameLight);
+                flameLights.push(flameLight);
+            });
+        }
+
+        function createDecorations() {
+            const balloonPositions = [[-7, 7, -8, 0xff1493], [7, 6.5, -8, 0x4169e1], [-6, 6.8, 8, 0xffd700], [6, 7.2, 8, 0x9370db], [-8, 6.9, 0, 0xff6347], [8, 7.1, 0, 0x00ced1]];
+            balloonPositions.forEach(pos => {
+                const balloon = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({ color: pos[3], roughness: 0.2, metalness: 0.3 }));
+                balloon.position.set(pos[0], pos[1], pos[2]);
+                balloon.scale.set(1, 1.3, 1);
+                balloon.castShadow = true;
+                scene.add(balloon);
+                balloons.push(balloon);
+
+                const highlight = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 }));
+                highlight.position.set(pos[0] - 0.12, pos[1] + 0.15, pos[2] + 0.25);
+                scene.add(highlight);
+
+                const string = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 2.5, 8), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+                string.position.set(pos[0], pos[1] - 1.25, pos[2]);
+                scene.add(string);
+            });
+
+            const banner = new THREE.Mesh(new THREE.PlaneGeometry(7, 0.9), new THREE.MeshStandardMaterial({ color: 0xff1493, roughness: 0.5, side: THREE.DoubleSide, emissive: 0xff1493, emissiveIntensity: 0.1 }));
+            banner.position.set(0, 7.5, -9.8);
+            scene.add(banner);
+        }
+
+        function createParticles() {
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particleCount = 100;
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 10;
+                positions[i + 1] = Math.random() * 6;
+                positions[i + 2] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particlesMaterial = new THREE.PointsMaterial({ color: 0xffd700, size: 0.05, transparent: true, opacity: 0.6 });
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            const confettiGeometry = new THREE.BufferGeometry();
+            const confettiCount = 150;
+            const confettiPositions = new Float32Array(confettiCount * 3);
+            const confettiColors = new Float32Array(confettiCount * 3);
+
+            for (let i = 0; i < confettiCount * 3; i += 3) {
+                confettiPositions[i] = (Math.random() - 0.5) * 12;
+                confettiPositions[i + 1] = Math.random() * 8 + 1;
+                confettiPositions[i + 2] = (Math.random() - 0.5) * 12;
+
+                const colors = [[1, 0.1, 0.5], [1, 0.8, 0], [0.2, 0.4, 1], [0.6, 0.2, 0.8], [1, 0.4, 0.7]];
+                const colorChoice = colors[Math.floor(Math.random() * colors.length)];
+                confettiColors[i] = colorChoice[0];
+                confettiColors[i + 1] = colorChoice[1];
+                confettiColors[i + 2] = colorChoice[2];
+            }
+
+            confettiGeometry.setAttribute('position', new THREE.BufferAttribute(confettiPositions, 3));
+            confettiGeometry.setAttribute('color', new THREE.BufferAttribute(confettiColors, 3));
+
+            const confettiMaterial = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, transparent: true, opacity: 0.8 });
+            confetti = new THREE.Points(confettiGeometry, confettiMaterial);
+            scene.add(confetti);
+        }
+
+        function createHeartTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.font = '48px serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💖', 32, 32);
+            heartTexture = new THREE.CanvasTexture(canvas);
+        }
+
+        function spawnHeart() {
+            const material = new THREE.SpriteMaterial({ map: heartTexture, transparent: true, opacity: 1 });
+            const heart = new THREE.Sprite(material);
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 0.35;
+            heart.position.set(Math.cos(angle) * radius, 2.9 + Math.random() * 0.2, Math.sin(angle) * radius);
+            heart.scale.set(0.25, 0.25, 0.25);
+            heart.userData = { velocity: 0.015 + Math.random() * 0.02, driftX: (Math.random() - 0.5) * 0.008, driftZ: (Math.random() - 0.5) * 0.008, life: 1.0, decay: 0.003 + Math.random() * 0.003 };
+            scene.add(heart);
+            hearts.push(heart);
+        }
+
+        let time = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.005;
+
+            controls.update();
+
+            cakeBase.rotation.y += 0.005;
+            cakeMiddle.rotation.y += 0.005;
+            cakeTop.rotation.y += 0.005;
+
+            loveNotes.forEach(noteGroup => {
+                noteGroup.position.y = noteGroup.userData.baseY + Math.sin(time * noteGroup.userData.floatSpeed + noteGroup.userData.floatOffset) * 0.2;
+                
+                const pulse = Math.sin(time * noteGroup.userData.pulseSpeed) * 0.1 + 1;
+                const baseScale = noteGroup.userData.baseScale;
+                noteGroup.userData.noteSprite.scale.set(
+                    baseScale * pulse, 
+                    baseScale * pulse, 
+                    baseScale * pulse
+                );
+            });
+
+            flames.forEach((flame, i) => {
+                if (candlesBlown[i]) return;
+                
+                const currentPos = candlePositions[i];
+                const baseTime = Date.now() * 0.01 + i;
+                const flicker1 = Math.sin(baseTime) * 0.15;
+
+                flame.core.scale.y = 1.8 + flicker1 * 1.2;
+                flame.core.position.y = currentPos[1] + 0.28 + Math.abs(flicker1) * 0.02;
+                flame.inner.scale.y = 1.6 + Math.sin(baseTime * 1.3) * 0.1;
+                flame.middle.scale.y = 1.5 + Math.sin(baseTime * 0.7) * 0.12;
+                flame.outer.scale.y = 1.4 + flicker1 * 0.6;
+                flameLights[i].intensity = 0.5 + Math.abs(flicker1) * 0.4;
+            });
+
+            if (Math.random() < 0.03) spawnHeart();
+
+            for (let i = hearts.length - 1; i >= 0; i--) {
+                const heart = hearts[i];
+                heart.position.y += heart.userData.velocity;
+                heart.position.x += heart.userData.driftX;
+                heart.position.z += heart.userData.driftZ;
+                heart.userData.life -= heart.userData.decay;
+                heart.material.opacity = Math.max(0, heart.userData.life);
+                const scale = 0.25 * heart.userData.life;
+                heart.scale.set(scale, scale, scale);
+                
+                if (heart.userData.life <= 0) {
+                    scene.remove(heart);
+                    hearts.splice(i, 1);
+                }
+            }
+
+            particles.rotation.y += 0.0005;
+            balloons.forEach((balloon, i) => {
+                balloon.position.y += Math.sin(time * 2 + i) * 0.001;
+                balloon.rotation.z = Math.sin(time + i) * 0.05;
+            });
+
+            const confettiPos = confetti.geometry.attributes.position.array;
+            for (let i = 1; i < confettiPos.length; i += 3) {
+                confettiPos[i] -= 0.002;
+                if (confettiPos[i] < 0.5) confettiPos[i] = 8;
+            }
+            confetti.geometry.attributes.position.needsUpdate = true;
+            confetti.rotation.y += 0.001;
+            chandelierGroup.rotation.z = Math.sin(time * 0.5) * 0.02;
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
